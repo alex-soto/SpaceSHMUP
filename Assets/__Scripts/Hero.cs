@@ -18,12 +18,6 @@ public class Hero : MonoBehaviour {
 		S = this;
 		bounds = Utils.CombineBoundsOfChildren (this.gameObject);
 	}
-
-
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
 	void Update () {

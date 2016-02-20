@@ -92,7 +92,7 @@ public class Utils : MonoBehaviour
 		return (BoundsInBoundsCheck( camBounds, bnd, test));
 	}
 	
-	// Checks to see if bounds lilb are within Bounds bigB
+	// Checks to see if bounds lilB are within Bounds bigB
 	public static Vector3 BoundsInBoundsCheck (Bounds bigB, Bounds lilB, BoundsTest test = BoundsTest.onScreen) {
 		// behavior needs to be different depending on the test selected
 		
