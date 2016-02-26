@@ -5,6 +5,9 @@ public class Hero : MonoBehaviour {
 
 	static public Hero		S;
 
+	public float gameRestartDelay = 2f;
+
+	// These fields control the movement of the ship
 	public float	speed = 30;
 	public float	rollMult = -45;
 	public float  	pitchMult=30;
@@ -15,6 +18,11 @@ public class Hero : MonoBehaviour {
 
 	public bool	_____________________;
 	public Bounds bounds;
+
+	// Declare a new delegate type WeaponFireDelegate
+	public delegate void WeaponFireDelegate();
+	// Create a WeaponFireDelegate field named fireDelegate.
+	public WeaponFireDelegate fireDelegate;
 
 	void Awake(){
 		S = this;
@@ -42,6 +50,13 @@ public class Hero : MonoBehaviour {
 		
 		// rotate the ship to make it feel more dynamic
 		transform.rotation =Quaternion.Euler(yAxis*pitchMult, xAxis*rollMult,0);
+
+		// Use the fireDelegate to fire Weapons
+		// First, make sure the Axis("Jump") button is pressed
+		// Then ensure that fireDelegate isn't null to avoid an error
+		if (Input.GetAxis ("Jump") == 1 && fireDelegate != null) {
+			fireDelegate();
+		}
 	}
 
 	// This variable holds a reference to the last triggering GameObject
@@ -82,6 +97,8 @@ public class Hero : MonoBehaviour {
 			// If the shield is going to be set to less than zero
 			if (value < 0){
 				Destroy(this.gameObject);
+				// Tell Main.S to restart the game after a delay
+				Main.S.DelayedRestart(gameRestartDelay);
 			}
 		}
 	}
