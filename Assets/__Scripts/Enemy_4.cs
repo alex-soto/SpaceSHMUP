@@ -91,7 +91,7 @@ public class Enemy_4 : Enemy {
 				break;
 			}
 
-			// Hut this Enemy
+			// Hurt this Enemy
 			// Find the GameObject that was hit
 			// The Collision coll has contacts[], an array of ContactPoints
 			// Because there was a collision, we're guaranteed that there is at
@@ -100,7 +100,7 @@ public class Enemy_4 : Enemy {
 			// Enemy_4 that was hit.
 			GameObject goHit = coll.contacts[0].thisCollider.gameObject;
 			Part prtHit = FindPart(goHit);
-			if (prtHit == null){ // If prtHit wasn't fnd
+			if (prtHit == null){ // If prtHit wasn't found
 				// ...then it's usually because, very rarely, thisCollider on
 				// contacts[0] will be the ProjectileHero instead of the ship
 				// part. If so, just look for otherCollider instead
@@ -118,6 +118,71 @@ public class Enemy_4 : Enemy {
 					}
 				}
 			}
+			// It's not protected, so make it take damage
+			// Get the damage amount from the Projectile.type & Main.W_DEFS
+			prtHit.health -= Main.W_DEFS[p.type].damageOnHit;
+			// Show damage on the part
+			ShowLocalizedDamage(prtHit.mat);
+			if (prtHit.health <= 0){
+				// Instead of Destroying this enemy, disable the damaged part
+				prtHit.go.SetActive(false);
+			}
+			// Check to see if the whole ship is destroyed
+			bool allDestroyed = true; // Assume it is destroyed
+			foreach(Part prt in parts){
+				if (!Destroyed(prt)){ // If a part still exists
+					allDestroyed = false; // ...change allDestroyed to false
+					break; // and break out of the foreach loop
+				}
+			}
+			if (allDestroyed){ // If it IS completely destroyed
+				// Tell the Main singleton that this ship has been destroyed
+				Main.S.ShipDestroyed(this);
+				// Destroy this Enemy
+				Destroy (this.gameObject);
+			}
+			Destroy (other); // Destroy the projectileHero
+			break;
 		}
+	}
+
+	// These two functions find a Part in this.parts by name or GameObject
+	Part FindPart(string n){
+		foreach(Part prt in parts){
+			if (prt.name == n){
+				return(prt);
+			}
+		}
+		return(null);
+	}
+	Part FindPart(GameObject go){
+		foreach(Part prt in parts){
+			if (prt.go == go){
+				return(prt);
+			}
+		}
+		return(null);
+	}
+
+	// These functions return true if the Part has been destroyed
+	bool Destroyed(GameObject go){
+		return(Destroyed (FindPart(go)));
+	}
+	bool Destroyed(string n){
+		return(Destroyed (FindPart(n)));
+	}
+	bool Destroyed(Part prt){
+		if (prt == null) { // If no real Part was passed in
+			return(true); // (meaning yes, it was destroyed)
+		}
+		// Returns the result of the comparison: prt.health <= 0
+		// If prt.health is 0 or less, returns true (yes, it was destroyed)
+		return(prt.health <= 0);
+	}
+
+	// This changes the color of just one Part to red instead of the whole ship
+	void ShowLocalizedDamage(Material m){
+		m.color = Color.red;
+		remainingDamageFrames = showDamageForFrames;
 	}
 }
